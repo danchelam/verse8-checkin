@@ -6,7 +6,7 @@ Verse8 每日签到任务
 由 verse8_runner.py 通过 base_module.run_batch() 调用。
 """
 
-__version__ = "2026.04.07.4"
+__version__ = "2026.04.07.5"
 
 import asyncio
 import datetime
@@ -340,18 +340,48 @@ async def run_task(page: Page, context: BrowserContext, account_id: str,
 
     log(aid, "挂机完成")
 
-    # ── 步骤6：跳转积分页面 ──
+    # ── 步骤6：跳转积分页面（先释放游戏资源防止 Page crashed） ──
     _update_status(aid, "checking_in", "跳转积分页")
+
+    # 尝试通过 JS 移除游戏 iframe 释放内存
+    try:
+        await page.evaluate("document.querySelectorAll('iframe').forEach(f => f.remove())")
+        log(aid, "已移除游戏 iframe，释放资源")
+        await asyncio.sleep(2)
+    except Exception:
+        pass
+
+    # 先导航到空白页，让渲染进程回收游戏的 GPU/内存
+    try:
+        await page.goto("about:blank", timeout=10000)
+        await asyncio.sleep(1)
+    except Exception:
+        pass
+
     log(aid, f"跳转积分页面: {POINT_URL}")
+    page_ok = False
     for attempt in range(3):
         try:
             await page.goto(POINT_URL, wait_until="domcontentloaded", timeout=60000)
+            page_ok = True
             break
         except Exception as e:
             log(aid, f"积分页面加载失败（{attempt+1}/3）: {e}")
+            if "crashed" in str(e).lower():
+                # 页面渲染进程崩溃，尝试新建标签页
+                log(aid, "页面崩溃，尝试新建标签页...")
+                try:
+                    page = await context.new_page()
+                    await page.goto(POINT_URL, wait_until="domcontentloaded", timeout=60000)
+                    page_ok = True
+                    log(aid, "新标签页加载成功")
+                    break
+                except Exception as e2:
+                    log(aid, f"新标签页也失败: {e2}")
             if attempt < 2:
                 await asyncio.sleep(5)
-    else:
+
+    if not page_ok:
         _update_status(aid, "failed", "积分页加载失败")
         return False
 

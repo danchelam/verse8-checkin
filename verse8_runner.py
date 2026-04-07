@@ -13,7 +13,7 @@ Verse8 签到 — 启动器 + Web 控制台
   浏览器打开 http://127.0.0.1:5001
 """
 
-__version__ = "2026.04.07.4"
+__version__ = "2026.04.07.5"
 
 from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO, emit
