@@ -1,0 +1,16 @@
+# 不上传到 GitHub 的文件
+*.exe
+*.bak
+*.har
+*.xlsx
+*.spec
+*.jsonl
+__pycache__/
+build/
+dist/
+screenshots/
+completed_tasks.json
+task_progress.json
+task_status.json
+templates/
+publish.py
