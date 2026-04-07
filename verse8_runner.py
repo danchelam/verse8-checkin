@@ -13,7 +13,7 @@ Verse8 签到 — 启动器 + Web 控制台
   浏览器打开 http://127.0.0.1:5001
 """
 
-__version__ = "2026.04.07.2"
+__version__ = "2026.04.07.3"
 
 from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO, emit
@@ -69,7 +69,7 @@ socketio = SocketIO(app, async_mode='threading')
 PROJECT_NAME = "Verse8 签到"
 TASK_MODULE_NAME = "verse8_task"
 TASK_FUNC_NAME = "run_task"          # task 模块中的入口函数名
-RUNNER_PORT = 5001
+RUNNER_PORT = 5002
 DEFAULT_WORKERS = 5
 
 # ═══════════════════════════════════════════════

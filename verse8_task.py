@@ -6,7 +6,7 @@ Verse8 每日签到任务
 由 verse8_runner.py 通过 base_module.run_batch() 调用。
 """
 
-__version__ = "2026.04.07.2"
+__version__ = "2026.04.07.3"
 
 import asyncio
 import datetime
